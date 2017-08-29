@@ -109,19 +109,22 @@ tOplkError target_createMutex(const char* mutexName_p,
 {
     sem_t*  lockSem;
 
-    // unlink any existing semaphore,
     // so it will be created with the correct init state
     // WARNING: target_createMutex() will create a new independent mutex on each
     //          call, even if the very same name is specified.
-    sem_unlink(mutexName_p);
+    UNUSED_PARAMETER(mutexName_p);
 
-    lockSem = sem_open(mutexName_p, O_CREAT | O_RDWR, S_IRWXG, 1);
-    if (lockSem == SEM_FAILED)
-        return kErrorNoFreeInstance;
-
-    *pMutex_p = lockSem;
-
-    return kErrorOk;
+    lockSem = malloc(sizeof(sem_t));
+    if (lockSem != NULL)
+    {
+        if (sem_init(lockSem, 0, 1) == 0)
+        {
+            *pMutex_p = lockSem;
+            return kErrorOk;
+        }
+        free(lockSem);
+    }
+    return kErrorNoFreeInstance;
 }
 
 //------------------------------------------------------------------------------
@@ -137,7 +140,11 @@ The function destroys a mutex.
 //------------------------------------------------------------------------------
 void target_destroyMutex(OPLK_MUTEX_T mutexId_p)
 {
-    sem_close(mutexId_p);
+    if (mutexId_p)
+    {
+        sem_close((sem_t*)mutexId_p);
+        free(mutexId_p);
+    }
 }
 
 //------------------------------------------------------------------------------
