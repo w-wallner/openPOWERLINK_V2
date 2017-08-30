@@ -1,0 +1,18 @@
+language: c
+
+compiler:
+  - clang
+  - gcc
+
+addons:
+  apt:
+    packages:
+      - libpcap-dev
+      - cmake-data
+      - cmake
+
+before_script:
+  - cd stack/build/linux
+  - cmake ../..
+
+script: make install
