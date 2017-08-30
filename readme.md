@@ -3,6 +3,8 @@ openPOWERLINK {#mainpage}
 
 ## openPOWERLINK - An Open Source POWERLINK protocol stack
 
+[![Build Status](https://travis-ci.org/banickn/openPOWERLINK_V2.svg?branch=develop-2.7)](https://travis-ci.org/banickn/openPOWERLINK_V2)
+
 Ethernet POWERLINK is a Real-Time Ethernet field bus system. It is
 based on the Fast Ethernet Standard IEEE 802.3.
 
