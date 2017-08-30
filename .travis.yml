@@ -3,16 +3,44 @@ language: c
 compiler:
   - clang
   - gcc
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "FtMuIhVdE8h9p+K0UPKHVdkg85fxziRpgktITtaAdR/X8ww5cwaka/g5Jr0+OJ4JNf6lv8QZv4SoruV/EpDdPUmqeWzYQ5kz4TgUfGbZVTcPVCxHgvJmIUFmkW/WMnjUu7mybjVF6mN8m+mtjAsmXRVFGRq2p/C99HFGVPiBlu/BM328yhsixAyWh6rQ50gEyk+M9UUDrvMmZgRU/VZhcZpB1mY1QIdT9WQm7gspICjFt1V6xWntOuajsUmZnKM80sUE9F8NP8bMS8KhUYyoYAo3F0ieAmVf37wkkET+/oZ3l26WHjg8uSwzTvIoRXaEkwLiw/W/JgaG4BRspkrRK0mpO6xfOFYZ/rxi6gYncVgxqCacHxe9CbdHgYUOaedfdtYoE3r/3GXLfqtrZHQ75cJV02uaxiLZ3h/MjP+HGWTR9VWyCrMuegTtOfajUOISlkQhblb6Br1xJYFSRWG1D7mxaGJaXLR+P4BkGGvMxSzUwPpxz4+ITnreBTXpxf/hS5c9OtAHFGyoV5cKTpb06HunuR7u4x3fShz45bikadpbJb76WIm8p2iwO7dRW+tpsyanz+LCioQ1MmzVGu4CCQLw1NINlGAnaH1bCd+Ek09FEH4eMrzFOuBeAvEtSJe5fXsnZx52Tf5Z3+mQW0Z0w0vamAsLnc4/fXYWuLuLZmc="
+
+
+before_install:
+      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 
 addons:
+  coverity_scan:
+    project:
+      name: "banickn/openPOWERLINK_V2"
+      description: "Build submitted via Travis CI"
+    notification_email: norman.banick@br-automation.com
+    build_command_prepend: "cd stack/build/linux; make clean; cmake ../.."
+    build_command:   "make install"
+    branch_pattern: develop-2.7
   apt:
     packages:
       - libpcap-dev
       - cmake-data
       - cmake
+      - qtbase5-dev
 
-before_script:
-  - cd stack/build/linux
+script:
+  - cd drivers/linux/drv_kernelmod_edrv/build/
+  - cmake ..
+  - cd ../../../../stack/build/linux
   - cmake ../..
-
-script: make install
+  - make install
+  - cd ../../../apps/demo_mn_console/build/linux
+  - cmake ../..
+  - make install
+  - cd ../../../demo_mn_qt/build/linux
+  - cmake ../..
+  - make install
+  - cd ../../../demo_cn_console/build/linux
+  - cmake ../..
+  - make install
